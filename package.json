@@ -7,7 +7,8 @@
     "start": "nodemon ./src/app.ts",
     "build": "tsc --project tsconfig.json",
     "prettier": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint --ignore-path .eslintignore \"src/**/*.ts\" --fix"
+    "lint": "eslint --ignore-path .eslintignore \"src/**/*.ts\" --fix",
+    "pre-commit": "lint-staged"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +32,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-promise": "^6.1.1",
     "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
     "nodemon": "^3.0.1",
     "prettier": "^3.1.0",
     "ts-node": "^10.9.1",
