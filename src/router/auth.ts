@@ -1,4 +1,4 @@
-import { signupWithGoogle } from 'controller/auth.ctrl'
+import { signupWithGoogle } from 'controller/auth'
 import express from 'express'
 
 const router = express.Router()

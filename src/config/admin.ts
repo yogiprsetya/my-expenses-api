@@ -1,5 +1,5 @@
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from './my-expenses-b7515-firebase-adminsdk-nr9d3-fea63baacc.json'
+import serviceAccount from './firebase-service.json'
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount)

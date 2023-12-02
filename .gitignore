@@ -1,2 +1,8 @@
 node_modules
 dist
+
+# credentials
+src/config/*.json
+
+# ENV
+.env
