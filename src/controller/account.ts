@@ -1,22 +1,22 @@
 import { FirestoreError, addDoc, collection, getDocs } from 'firebase/firestore'
-import { Request, Response, Router } from 'express'
+import { Request, Response } from 'express'
 import { db } from 'config/firebase'
 import { body } from 'express-validator'
 import { failHandler, okayHandler } from 'helper/responseHandler'
 import { FirestoreErrorCodeMapping, HttpCode } from 'constant/error-code'
 import { AccountModel } from 'model/Account'
-import Controller from 'interface/controller'
+import { Controller } from 'interface/controller'
 import { verifyToken } from 'middleware/verify-token'
 
 export const validateCreateAccount = [
   body('name').isLength({ min: 2, max: 25 }).withMessage('Field `name` is required')
 ]
 
-export class AccountController implements Controller {
+export class AccountController extends Controller {
   public path = '/account'
-  public router = Router()
 
   constructor() {
+    super()
     this.initializeRoutes()
   }
 
@@ -41,6 +41,7 @@ export class AccountController implements Controller {
 
   private GetAccount = async (req: Request, res: Response): Promise<void> => {
     const snap = await getDocs(collection(db, 'accounts'))
+    console.log(req.user)
 
     const result = snap.docs.map((d) => {
       const accounts = new AccountModel(d.id, d.data().name)

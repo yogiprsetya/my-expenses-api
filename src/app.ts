@@ -1,28 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import Controller from 'interface/controller'
+import { IController } from 'interface/controller'
 import { errorHandler } from 'middleware/error-handling'
-
-// const app = express()
-
-// //middlewares
-// app.use(express.json())
-// app.use(cors())
-// app.use(express.urlencoded({ extended: true }))
-// app.use(bodyParser.json())
-// app.use(VerifyToken)
-
-// //routes
-// app.use('/api/v1', authRoutes)
-// app.use('/api/v1', accountRoutes)
-
-// app.listen(7070, () => console.log('Server is listening on port 7070'))
 
 class App {
   public app: express.Application
 
-  constructor(controllers: Controller[]) {
+  constructor(controllers: IController[]) {
     this.app = express()
 
     // this.connectToTheDatabase()
@@ -53,7 +38,7 @@ class App {
     this.app.use(errorHandler)
   }
 
-  private initializeControllers(controllers: Controller[]) {
+  private initializeControllers(controllers: IController[]) {
     controllers.forEach((controller) => {
       this.app.use('/api/v1', controller.router)
     })

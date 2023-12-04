@@ -1,9 +1,5 @@
-import { DecodedIdToken } from 'firebase-admin/lib/auth'
-
-declare global {
-  namespace Express {
-    export interface Request {
-      user: DecodedIdToken
-    }
+declare namespace Express {
+  export interface Request {
+    user: UserModel
   }
 }
