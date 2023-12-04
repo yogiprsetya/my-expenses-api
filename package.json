@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/app.ts",
-    "dev": "nodemon --exec npx ts-node -r tsconfig-paths/register ./src/app.ts",
+    "start": "node ./src/server.ts",
+    "dev": "nodemon --exec npx ts-node -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc --project tsconfig.json",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint --ignore-path .eslintignore \"src/**/*.ts\" --fix",
