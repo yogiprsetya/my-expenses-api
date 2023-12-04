@@ -16,6 +16,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     })
 
     const payload = ticket.getPayload()
+    console.log(ticket)
 
     if (payload) {
       const user = new UserModel({

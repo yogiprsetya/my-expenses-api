@@ -7,6 +7,7 @@ import { FirestoreErrorCodeMapping, HttpCode } from 'constant/error-code'
 import { AccountModel } from 'model/Account'
 import { Controller } from 'interface/controller'
 import { verifyToken } from 'middleware/verify-token'
+import { validate } from 'middleware/validate'
 
 export const validateCreateAccount = [
   body('name').isLength({ min: 2, max: 25 }).withMessage('Field `name` is required')
@@ -22,8 +23,8 @@ export class AccountController extends Controller {
 
   private initializeRoutes() {
     this.router
-      .all('*', verifyToken)
-      .post(this.path, validateCreateAccount, this.CreateAccount)
+      .all(`${this.path}/*`, verifyToken)
+      .post(this.path, validateCreateAccount, validate, this.CreateAccount)
       .get(this.path, this.GetAccount)
   }
 
