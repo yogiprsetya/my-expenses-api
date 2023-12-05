@@ -1,4 +1,4 @@
-import { FirestoreError, addDoc, collection, getDocs } from 'firebase/firestore'
+import { FirestoreError, addDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { Request, Response } from 'express'
 import { db } from 'config/firebase'
 import { body } from 'express-validator'
@@ -23,7 +23,7 @@ export class AccountController extends Controller {
 
   private initializeRoutes() {
     this.router
-      .all(`${this.path}/*`, verifyToken)
+      .all(this.path, verifyToken)
       .post(this.path, validateCreateAccount, validate, this.CreateAccount)
       .get(this.path, this.GetAccount)
   }
@@ -32,7 +32,7 @@ export class AccountController extends Controller {
     const data = req.body
 
     try {
-      await addDoc(collection(db, 'accounts'), { name: data.name })
+      await addDoc(collection(db, 'accounts'), { userId: req.user.userId, name: data.name })
       res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
     } catch (err) {
       const error = err as FirestoreError
@@ -41,8 +41,8 @@ export class AccountController extends Controller {
   }
 
   private GetAccount = async (req: Request, res: Response): Promise<void> => {
-    const snap = await getDocs(collection(db, 'accounts'))
-    console.log(req.user)
+    const selects = query(collection(db, 'accounts'), where('userId', '==', req.user.userId))
+    const snap = await getDocs(selects)
 
     const result = snap.docs.map((d) => {
       const accounts = new AccountModel(d.id, d.data().name)

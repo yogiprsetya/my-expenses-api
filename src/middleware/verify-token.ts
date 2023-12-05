@@ -16,7 +16,6 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     })
 
     const payload = ticket.getPayload()
-    console.log(ticket)
 
     if (payload) {
       const user = new UserModel({
@@ -32,7 +31,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 
   verify().catch((e) => {
     if (e instanceof Error) {
-      return res.json({ message: e.message })
+      return res.status(HttpCode.UNAUTHORIZED).json({ message: e.message })
     }
 
     return res.json({ message: 'Internal Error' })
