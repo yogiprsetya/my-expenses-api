@@ -1,9 +1,9 @@
-import { FirestoreError, addDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { Request, Response } from 'express'
 import { db } from 'config/firebase'
 import { body } from 'express-validator'
-import { failHandler, okayHandler } from 'helper/responseHandler'
-import { FirestoreErrorCodeMapping, HttpCode } from 'constant/error-code'
+import { okayHandler } from 'helper/responseHandler'
+import { HttpCode } from 'constant/error-code'
 import { Controller } from 'interface/controller'
 import { verifyToken } from 'middleware/verify-token'
 import { validate } from 'middleware/validate'
@@ -33,13 +33,8 @@ export class IncomeResourceController extends Controller {
   private CreateResource = async (req: Request, res: Response) => {
     const data = req.body
 
-    try {
-      await addDoc(this.SelectIncomeTable, { userId: req.user.userId, resource: data.resource })
-      res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-    } catch (err) {
-      const error = err as FirestoreError
-      res.status(FirestoreErrorCodeMapping[error.code]).json(failHandler(error))
-    }
+    await addDoc(this.SelectIncomeTable, { userId: req.user.userId, resource: data.resource })
+    res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
   }
 
   private GetResource = async (req: Request, res: Response): Promise<void> => {

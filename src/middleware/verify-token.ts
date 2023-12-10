@@ -2,6 +2,7 @@ import { HttpCode } from 'constant/error-code'
 import { Request, Response, NextFunction } from 'express'
 import { UserModel } from 'model/User'
 import { auth } from 'config/admin'
+import { FirebaseError } from 'firebase/app'
 
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1] ?? ''
@@ -10,7 +11,6 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 
   try {
     const payload = await auth.verifyIdToken(token)
-    console.log(payload)
 
     if (payload) {
       const user = new UserModel({
@@ -26,7 +26,12 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     return res.status(HttpCode.UNAUTHORIZED).json({ message: 'Unauthorized' })
   } catch (e) {
     if (e instanceof Error) {
-      return res.status(HttpCode.UNAUTHORIZED).json({ message: e.message })
+      const error = e as FirebaseError
+
+      return res.status(HttpCode.UNAUTHORIZED).json({
+        message:
+          error.code === 'auth/id-token-expired' ? 'Sesi habis, login kembali.' : error.message
+      })
     }
 
     return res.json({ message: 'Internal Error' })
