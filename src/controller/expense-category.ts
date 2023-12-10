@@ -3,12 +3,12 @@ import { db } from 'config/firebase'
 import { body } from 'express-validator'
 import { NatureExpenses } from 'interface/expense-nature'
 import { Controller } from 'interface/controller'
-import { collection, getDocs, where, query, addDoc } from 'firebase/firestore'
+import { collection, getDocs, where, query, addDoc, doc, deleteDoc } from 'firebase/firestore'
 import { TableName } from 'interface/database'
 import { verifyToken } from 'middleware/verify-token'
 import { validate } from 'middleware/validate'
 import { ExpenseCategoryModel } from 'model/ExpenseCategory'
-import { okayHandler } from 'helper/responseHandler'
+import { failHandler, okayHandler } from 'helper/responseHandler'
 import { HttpCode } from 'constant/error-code'
 
 const validateCreateExpenseCat = [
@@ -28,11 +28,12 @@ export class ExpenseCategoryController extends Controller {
   private initializeRoutes() {
     this.router
       .all(this.path, verifyToken)
-      .post(this.path, validateCreateExpenseCat, validate, this.CreateExpenseCa)
+      .post(this.path, validateCreateExpenseCat, validate, this.CreateExpenseCat)
+      .delete(`${this.path}/:id`, this.DeleteExpenseCat)
       .get(this.path, this.GetExpenseCat)
   }
 
-  private CreateExpenseCa = async (req: Request, res: Response) => {
+  private CreateExpenseCat = async (req: Request, res: Response) => {
     const data = req.body
 
     await addDoc(this.SelectExpenseTable, {
@@ -41,6 +42,23 @@ export class ExpenseCategoryController extends Controller {
       nature: data.nature
     })
 
+    res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
+  }
+
+  private DeleteExpenseCat = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if (!id) {
+      return res.status(HttpCode.UNPROCESSABLE_ENTITY).json(
+        failHandler({
+          message: 'ID not passed',
+          code: 'invalid-argument',
+          name: 'delete expense-category'
+        })
+      )
+    }
+
+    await deleteDoc(doc(db, TableName.EXPENSE_CATEGORY, id))
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
   }
 

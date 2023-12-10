@@ -1,8 +1,8 @@
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { Request, Response } from 'express'
 import { db } from 'config/firebase'
 import { body } from 'express-validator'
-import { okayHandler } from 'helper/responseHandler'
+import { failHandler, okayHandler } from 'helper/responseHandler'
 import { HttpCode } from 'constant/error-code'
 import { Controller } from 'interface/controller'
 import { verifyToken } from 'middleware/verify-token'
@@ -27,6 +27,7 @@ export class IncomeResourceController extends Controller {
     this.router
       .all(this.path, verifyToken)
       .post(this.path, validateCreateResource, validate, this.CreateResource)
+      .delete(`${this.path}/:id`, this.DeleteResource)
       .get(this.path, this.GetResource)
   }
 
@@ -34,6 +35,23 @@ export class IncomeResourceController extends Controller {
     const data = req.body
 
     await addDoc(this.SelectIncomeTable, { userId: req.user.userId, resource: data.resource })
+    res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
+  }
+
+  private DeleteResource = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if (!id) {
+      return res.status(HttpCode.UNPROCESSABLE_ENTITY).json(
+        failHandler({
+          message: 'ID not passed',
+          code: 'invalid-argument',
+          name: 'delete income-resource'
+        })
+      )
+    }
+
+    await deleteDoc(doc(db, TableName.INCOME_RESOURCE, id))
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
   }
 

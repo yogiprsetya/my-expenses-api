@@ -1,8 +1,8 @@
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { Request, Response } from 'express'
 import { db } from 'config/firebase'
 import { body } from 'express-validator'
-import { okayHandler } from 'helper/responseHandler'
+import { failHandler, okayHandler } from 'helper/responseHandler'
 import { HttpCode } from 'constant/error-code'
 import { AccountModel } from 'model/Account'
 import { Controller } from 'interface/controller'
@@ -27,6 +27,7 @@ export class AccountController extends Controller {
     this.router
       .all(this.path, verifyToken)
       .post(this.path, validateCreateAccount, validate, this.CreateAccount)
+      .delete(`${this.path}/:id`, this.DeleteAccount)
       .get(this.path, this.GetAccount)
   }
 
@@ -34,6 +35,23 @@ export class AccountController extends Controller {
     const data = req.body
 
     await addDoc(this.SelectAccountTable, { userId: req.user.userId, name: data.name })
+    res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
+  }
+
+  private DeleteAccount = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if (!id) {
+      return res.status(HttpCode.UNPROCESSABLE_ENTITY).json(
+        failHandler({
+          message: 'ID not passed',
+          code: 'invalid-argument',
+          name: 'delete account'
+        })
+      )
+    }
+
+    await deleteDoc(doc(db, TableName.ACCOUNT, id))
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
   }
 
