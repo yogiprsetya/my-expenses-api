@@ -6,3 +6,6 @@ src/config/*.json
 
 # ENV
 .env
+
+# credentials
+src/config/*.json
