@@ -9,6 +9,7 @@ import { verifyToken } from 'middleware/verify-token'
 import { validate } from 'middleware/validate'
 import { TableName } from 'interface/database'
 import { IncomeResourceModel } from 'model/IncomeResource'
+import { catchAsync } from 'helper/catch-async'
 
 const validateCreateResource = [
   body('resource').isLength({ min: 2, max: 35 }).withMessage('Field `resource` is required')
@@ -31,14 +32,14 @@ export class IncomeResourceController extends Controller {
       .get(this.path, this.GetResource)
   }
 
-  private CreateResource = async (req: Request, res: Response) => {
+  private CreateResource = catchAsync(async (req: Request, res: Response) => {
     const data = req.body
 
     await addDoc(this.SelectIncomeTable, { userId: req.user.userId, resource: data.resource })
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-  }
+  })
 
-  private DeleteResource = async (req: Request, res: Response) => {
+  private DeleteResource = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id) {
@@ -53,9 +54,9 @@ export class IncomeResourceController extends Controller {
 
     await deleteDoc(doc(db, TableName.INCOME_RESOURCE, id))
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-  }
+  })
 
-  private GetResource = async (req: Request, res: Response): Promise<void> => {
+  private GetResource = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const selects = query(this.SelectIncomeTable, where('userId', '==', req.user.userId))
     const snap = await getDocs(selects)
 
@@ -65,5 +66,5 @@ export class IncomeResourceController extends Controller {
     })
 
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK', result: result }))
-  }
+  })
 }

@@ -10,6 +10,7 @@ import { validate } from 'middleware/validate'
 import { ExpenseCategoryModel } from 'model/ExpenseCategory'
 import { failHandler, okayHandler } from 'helper/responseHandler'
 import { HttpCode } from 'constant/error-code'
+import { catchAsync } from 'helper/catch-async'
 
 const validateCreateExpenseCat = [
   body('name').isLength({ min: 2, max: 35 }).withMessage('Field `name` is required'),
@@ -33,7 +34,7 @@ export class ExpenseCategoryController extends Controller {
       .get(this.path, this.GetExpenseCat)
   }
 
-  private CreateExpenseCat = async (req: Request, res: Response) => {
+  private CreateExpenseCat = catchAsync(async (req: Request, res: Response) => {
     const data = req.body
 
     await addDoc(this.SelectExpenseTable, {
@@ -43,9 +44,9 @@ export class ExpenseCategoryController extends Controller {
     })
 
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-  }
+  })
 
-  private DeleteExpenseCat = async (req: Request, res: Response) => {
+  private DeleteExpenseCat = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id) {
@@ -60,9 +61,9 @@ export class ExpenseCategoryController extends Controller {
 
     await deleteDoc(doc(db, TableName.EXPENSE_CATEGORY, id))
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-  }
+  })
 
-  private GetExpenseCat = async (req: Request, res: Response) => {
+  private GetExpenseCat = catchAsync(async (req: Request, res: Response) => {
     const selects = query(this.SelectExpenseTable, where('userId', '==', req.user.userId))
     const snap = await getDocs(selects)
 
@@ -76,5 +77,5 @@ export class ExpenseCategoryController extends Controller {
     })
 
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK', result: result }))
-  }
+  })
 }

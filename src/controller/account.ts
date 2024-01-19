@@ -9,6 +9,7 @@ import { Controller } from 'interface/controller'
 import { verifyToken } from 'middleware/verify-token'
 import { validate } from 'middleware/validate'
 import { TableName } from 'interface/database'
+import { catchAsync } from 'helper/catch-async'
 
 export const validateCreateAccount = [
   body('name').isLength({ min: 2, max: 25 }).withMessage('Field `name` is required')
@@ -31,14 +32,14 @@ export class AccountController extends Controller {
       .get(this.path, this.GetAccount)
   }
 
-  private CreateAccount = async (req: Request, res: Response) => {
+  private CreateAccount = catchAsync(async (req: Request, res: Response) => {
     const data = req.body
 
     await addDoc(this.SelectAccountTable, { userId: req.user.userId, name: data.name })
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-  }
+  })
 
-  private DeleteAccount = async (req: Request, res: Response) => {
+  private DeleteAccount = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!id) {
@@ -53,9 +54,9 @@ export class AccountController extends Controller {
 
     await deleteDoc(doc(db, TableName.ACCOUNT, id))
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK' }))
-  }
+  })
 
-  private GetAccount = async (req: Request, res: Response): Promise<void> => {
+  private GetAccount = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const selects = query(this.SelectAccountTable, where('userId', '==', req.user.userId))
     const snap = await getDocs(selects)
 
@@ -65,5 +66,5 @@ export class AccountController extends Controller {
     })
 
     res.status(HttpCode.OK).json(okayHandler({ message: 'OK', result: result }))
-  }
+  })
 }
