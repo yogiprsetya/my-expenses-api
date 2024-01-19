@@ -12,8 +12,8 @@ class App {
 
     // this.connectToTheDatabase()
     this.initializeMiddlewares()
-    this.initializeErrorHandling()
     this.initializeControllers(controllers)
+    this.initializeErrorHandling()
   }
 
   public listen() {
